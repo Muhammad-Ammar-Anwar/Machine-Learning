@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+from matplotlib import pyplot as plt
+import seaborn as sns
+
+df=pd.read_csv('cars.csv')
+
+ohe=OneHotEncoder(drop='first',sparse_output=False,handle_unknown='ignore').set_output(transform='pandas')
+
+df_ohe= ohe.fit_transform(df[['Owner']])
+
+
+# Handling Missing Values
+
+drop_rows = []
+for x in df.columns:
+    if df[x].isnull().mean() < 0.05 and df[x].isnull().mean() > 0:
+        drop_rows.append(x)
+print(drop_rows)
+
+df.dropna(subset=drop_rows,inplace=True)
+
+from sklearn.impute import SimpleImputer
+
+# For Numerical:
+
+si_mean =SimpleImputer(strategy='mean')
+df_mean = pd.DataFrame(si_mean.fit_transform(df[['Age']]),columns=['Age_N'])
+
+df_mean.sample(5)
+
+
+df_n = pd.concat([df.drop(columns=['Age']),df_mean],axis=1)
+
+
+si_median = SimpleImputer(strategy='median')
+df_median = pd.DataFrame(si_median.fit_transform(df[['Fare']]),columns=['Fare_N'])
+
+
+
+imputer = SimpleImputer(strategy='most_frequent')
+
+
+
+
